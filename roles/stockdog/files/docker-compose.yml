@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: ${SERVICE_NAME}_db
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    expose:
+      - 5432
+    ports:
+      - "2345:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  backend:
+    image: danishjoseph/stockdog:v-0.0.2
+    container_name: ${SERVICE_NAME}_backend
+    restart: on-failure
+    expose:
+      - 3000
+    depends_on:
+      - postgres
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ${SERVICE_NAME}_grafana
+    ports:
+      - "${PORT}:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    restart: on-failure
+    depends_on:
+      - postgres
+      - backend
+
+networks:
+  default:
+    name: ${SERVICE_NAME}
+
+volumes:
+  db-data:
+    name: "${SERVICE_NAME}_db"
+    external: false
+  grafana-data:
+    name: "${SERVICE_NAME}_grafana"
+    external: false

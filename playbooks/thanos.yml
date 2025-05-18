@@ -1,0 +1,18 @@
+---
+- hosts: thanos
+  become: true
+  gather_facts: false
+  roles:
+    - role: system
+    - role: blog
+    - role: jellyfin
+    - role: actual
+    - role: duplicati
+    - role: electrolab
+    - role: trichurtrophies
+    - role: qbittorrent
+    - role: uptimekuma
+    - role: smarthome
+    - role: stockdog
+    - role: cloudflared
+    # - role: immich
